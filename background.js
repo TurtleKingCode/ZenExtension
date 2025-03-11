@@ -6,9 +6,12 @@ console.log('Focus Timer extension background script loaded');
 // Track YouTube tabs that are currently open
 const openYouTubeTabs = new Set();
 
-//chrome.tabs.query({ currentWindow: true }, (tabs) => {
-//	console.log('tabs: ', tabs);
-//});
+/*
+ * 1 Identify tabs that are already present
+ * 2 Listen for new tabs being created and removed
+ * 3 Listen for tab URL changes
+ */
+
 chrome.tabs.query({}, (tabs) => {
 	tabs.forEach((tab) => {
 		if (tab.url && tab.url.includes('youtube.com')) {
@@ -32,23 +35,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 	}
 });
 
-/*
-//chrome.tabs.onActivated.addListener(moveToFirstPosition);
-
-async function moveToFirstPosition(activeInfo) {
-	try {
-		await chrome.tabs.move(activeInfo.tabId, { index: 0 })
-		console.log('Success.');
-	} catch (error) {
-		if (error == 'Error: Tabs cannot be edited right now (user may be dragging a tab).') {
-			setTimeout(() => moveToFirstPosition(activeInfo), 50);
-		} else {
-			console.error(error);
-		}
-	}
-}
-*/
-
 // Listen for tabs being closed
 chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
 	// Check if the closed tab was a YouTube tab
@@ -59,12 +45,6 @@ chrome.tabs.onRemoved.addListener((tabId, removeInfo) => {
 		console.log([...openYouTubeTabs]);
 	}
 });
-
-//chrome.tabs.onActivated.addListener((activeInfo) => {
-//	console.log(`Tab activated (Tab ID: ${activeInfo.tabId})`);
-//	console.log(activeInfo);
-//	console.log(`Tab details:`, chrome.tabs.get(activeInfo.tabId));
-//});
 
 // Handle tab URL changes (user navigates to/from YouTube)
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
@@ -89,6 +69,4 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 			console.log([...openYouTubeTabs]);
 		}
 	}
-	//tabId: ${JSON.stringify(tabId)}
-	//console.log(`tabId: ${tabId}`, `changeInfo: ${JSON.stringify(changeInfo)}`, `tab: ${JSON.stringify(tab)}`);
 });
